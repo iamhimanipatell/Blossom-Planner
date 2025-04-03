@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blossom Planner</title>
+    <!-- Import Tailwind CSS for utility classes -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Import Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Import Font Awesome for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Base styles */
+        :root {
+            /* Color palette - soft, feminine colors */
+            --primary: #f5a8c0;
+            --primary-dark: #e5799e;
+            --secondary: #b8e0d2;
+            --accent: #ffd1dc;
+            --text: #4a4a4a;
+            --bg-light: #fff9fb;
+            --bg-dark: #f9f1f5;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 700;
+        }
+
+        .title-font {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* Card styling with soft shadows */
+        .planner-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .planner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Custom checkboxes for to-do list */
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            outline: none;
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .custom-checkbox:checked {
+            background-color: var(--primary);
+        }
+        
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Progress bar styling */
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.5s ease;
+        }
+
+        /* Button styling */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Input styling */
+        .planner-input {
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
+        
+        .planner-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Calendar styling */
+        .calendar-day {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--accent);
+        }
+        
+        .calendar-day.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--primary);
+        }
+        
+        .calendar-day.other-month {
+            color: #c0c0c0;
+        }
+        
+        /* Notes section */
+        .note {
+            background-color: #fffde7;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .note:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Tab system */
+        .tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* Navigation buttons */
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-icon:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Decorative elements */
+        .deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative background elements -->
+    <div class="deco-circle" style="width: 300px; height: 300px; background-color: var(--accent); top: -150px; right: -100px;"></div>
+    <div class="deco-circle" style="width: 200px; height: 200px; background-color: var(--secondary); bottom: 100px; left: -100px;"></div>
+
+    <!-- Main container -->
+    <div class="container mx-auto px-4 py-10 max-w-6xl">
+        <!-- Header section -->
+        <header class="text-center mb-16 animate-fade-in">
+            <h1 class="title-font text-6xl mb-4 text-primary-dark" style="color: var(--primary-dark);">Blossom Planner</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Your beautiful space for planning, reflection, and growth</p>
+        </header>
+
+        <!-- Current date display -->
+        <div class="text-center mb-10 animate-fade-in" style="animation-delay: 0.2s;">
+            <h2 class="text-3xl mb-2" id="current-date">Today's Date</h2>
+            <p class="text-gray-500" id="current-day">Day of Week</p>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="flex justify-center mb-10 overflow-x-auto space-x-4 animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="tab active" data-tab="daily">Daily</div>
+            <div class="tab" data-tab="weekly">Weekly</div>
+            <div class="tab" data-tab="monthly">Monthly</div>
+            <div class="tab" data-tab="goals">Goals</div>
+            <div class="tab" data-tab="affirmations">Affirmations</div>
+            <div class="tab" data-tab="notes">Notes</div>
+        </div>
+
+        <!-- Daily tab content -->
+        <div id="daily-content" class="tab-content active animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Daily to-do list -->
+                <div class="planner-card p-6">
+                    <h3 class="text-2xl mb-4 font-semibold flex items-center">
+                        <i class="fas fa-list-check mr-2" style="color: var(--primary);"></i>
+                        Today's Tasks
+                    </h3>
+                    <div class="todo-list space-y-3 mb-6">
+                        <!-- Sample to-do items -->
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">Morning meditation</span>
+                            <button class="text-gray-400 hover:text-gray-600 delete-task">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">Prepare healthy lunch</span>
+                            <button class="text-gray-400 hover:text-gray-600 delete-task">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">30 minutes workout</span>
+                            <button class="text-gray-400 hover:text-gray-600 delete-task">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Add new to-do form -->
+                    <div class="flex items-center">
+                        <input type="text" id="new-task" class="planner-input flex-grow mr-2" placeholder="Add a new task...">
+                        <button id="add-task-btn" class="btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Task progress -->
+                    <div class="mt-6">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Daily Progress</span>
+                            <span id="task-progress">0/3 completed</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Daily reflection -->
+                <div class="planner-card p-6">
+                    <h3 class="text-2xl mb-4 font-semibold flex items-center">
+                        <i class="fas fa-sun mr-2" style="color: var(--primary);"></i>
+                        Daily Reflection
+                    </h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-600 mb-2">Today's mood</label>
+                        <div class="flex justify-between">
+                            <div class="mood-option text-center cursor-pointer">
+                                <div class="text-2xl mb-1">😊</div>
+                                <span class="text-sm">Happy</span>
+                            </div>
+                            <div class="mood-option text-center cursor-pointer">
+                                <div class="text-2xl mb-1">😌</div>
+                                <span class="text-sm">Calm</span>
+                            </div>
+                            <div class="mood-option text-center cursor-pointer">
+                                <div class="text-2xl mb-1">😐</div>
+                                <span class="text-sm">Neutral</span>
+                            </div>
+                            <div class="mood-option text-center cursor-pointer">
+                                <div class="text-2xl mb-1">😢</div>
+                                <span class="text-sm">Sad</span>
+                            </div>
+                            <div class="mood-option text-center cursor-pointer">
+                                <div class="text-2xl mb-1">😤</div>
+                                <span class="text-sm">Stressed</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-600 mb-2">I'm grateful for...</label>
+                        <textarea class="planner-input h-20" placeholder="List 3 things you're grateful for today..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-600 mb-2">Today's highlight</label>
+                        <textarea class="planner-input h-20" placeholder="What was the best part of your day?"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly tab content -->
+        <div id="weekly-content" class="tab-content">
+            <div class="planner-card p-6 mb-8">
+                <h3 class="text-2xl mb-6 font-semibold">Weekly Overview</h3>
+                
+                <!-- Week selector -->
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-icon" id="prev-week">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h4 class="text-xl font-medium" id="week-range"></h4>
+                    <button class="btn-icon" id="next-week">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Days of the week -->
+                <div class="grid grid-cols-7 gap-4 mb-6">
+                    <!-- Day headers -->
+                    <div class="text-center font-medium">Mon</div>
+                    <div class="text-center font-medium">Tue</div>
+                    <div class="text-center font-medium">Wed</div>
+                    <div class="text-center font-medium">Thu</div>
+                    <div class="text-center font-medium">Fri</div>
+                    <div class="text-center font-medium">Sat</div>
+                    <div class="text-center font-medium">Sun</div>
+                    
+                    <!-- Days - Will be filled by JavaScript -->
+                    <div id="weekly-days" class="grid grid-cols-7 gap-2 col-span-7">
+                        <!-- Days will be inserted here by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Weekly priorities -->
+                <div class="mb-6">
+                    <h4 class="text-xl mb-3 font-medium">Weekly Priorities</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">Complete project proposal</span>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">Schedule dentist appointment</span>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" class="custom-checkbox mr-3">
+                            <span class="flex-grow">Plan weekend getaway</span>
+                        </div>
+                        <div class="flex items-center mt-3">
+                            <input type="text" class="planner-input" placeholder="Add weekly priority...">
+                            <button class="btn ml-2">Add</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Habit tracker -->
+                <div>
+                    <h4 class="text-xl mb-3 font-medium">Weekly Habits</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="text-left py-2">Habit</th>
+                                    <th class="text-center">M</th>
+                                    <th class="text-center">T</th>
+                                    <th class="text-center">W</th>
+                                    <th class="text-center">T</th>
+                                    <th class="text-center">F</th>
+                                    <th class="text-center">S</th>
+                                    <th class="text-center">S</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-2">Morning meditation</td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Drink 8 glasses of water</td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2">Exercise 30 minutes</td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto" checked></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                    <td class="text-center"><input type="checkbox" class="custom-checkbox mx-auto"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex items-center mt-4">
+                        <input type="text" class="planner-input" placeholder="Add new habit to track...">
+                        <button class="btn ml-2">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly tab content -->
+        <div id="monthly-content" class="tab-content">
+            <div class="planner-card p-6 mb-8">
+                <h3 class="text-2xl mb-6 font-semibold">Monthly Calendar</h3>
+                
+                <!-- Month selector -->
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-icon" id="prev-month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h4 class="text-xl font-medium" id="month-year"></h4>
+                    <button class="btn-icon" id="next-month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Calendar grid -->
+                <div class="mb-8">
+                    <!-- Day headers -->
+                    <div class="grid grid-cols-7 gap-2 mb-2 text-center">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    
+                    <!-- Calendar days - Will be filled by JavaScript -->
+                    <div id="month-days" class="grid grid-cols-7 gap-2">
+                        <!-- Days will be inserted here by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Monthly goals -->
+                <div class="mb-8">
+                    <h4 class="text-xl mb-4 font-medium">Monthly Goals</h4>
+                    <div class="space-y-4">
+                        <div class="border-l-4 pl-4 py-2" style="border-color: var(--primary);">
+                            <h5 class="font-medium">Career</h5>
+                            <p class="text-gray-600">Complete professional development course</p>
+                            <div class="mt-2">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 60%"></div>
+                                </div>
+                                <div class="text-right text-sm mt-1 text-gray-500">60%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 pl-4 py-2" style="border-color: var(--secondary);">
+                            <h5 class="font-medium">Health</h5>
+                            <p class="text-gray-600">Exercise 20 days this month</p>
+                            <div class="mt-2">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 45%"></div>
+                                </div>
+                                <div class="text-right text-sm mt-1 text-gray-500">9/20 days</div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 pl-4 py-2" style="border-color: var(--accent);">
+                            <h5 class="font-medium">Personal</h5>
+                            <p class="text-gray-600">Read 2 books</p>
+                            <div class="mt-2">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 25%"></div>
+                                </div>
+                                <div class="text-right text-sm mt-1 text-gray-500">0.5/2 books</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn mt-4">Add Monthly Goal</button>
+                </div>
+                
+                <!-- Theme of the month -->
+                <div>
+                    <h4 class="text-xl mb-3 font-medium">Theme of the Month</h4>
+                    <div class="planner-input cursor-pointer font-medium text-center py-4" style="background-color: var(--bg-dark); border-color: var(--primary);">
+                        Self-Care & Renewal
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals tab content -->
+        <div id="goals-content" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Long-term goals card -->
+                <div class="planner-card p-6">
+                    <h3 class="text-2xl mb-4 font-semibold flex items-center">
+                        <i class="fas fa-star mr-2" style="color: var(--primary);"></i>
+                        Long-term Goals
+                    </h3>
+                    
+                    <!-- Goal categories -->
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="flex items-center text-lg mb-2">
+                                <span class="w-3 h-3 rounded-full mr-2" style="background-color: #f8a5c2;"></span>
+                                Career
+                            </h4>
+                            <div class="ml-5 space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Get promoted to senior position</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Complete advanced certification</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="text" class="planner-input text-sm" placeholder="Add new career goal...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="flex items-center text-lg mb-2">
+                                <span class="w-3 h-3 rounded-full mr-2" style="background-color: #b5ead7;"></span>
+                                Health & Wellness
+                            </h4>
+                            <div class="ml-5 space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Run a half marathon</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Establish consistent sleep schedule</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="text" class="planner-input text-sm" placeholder="Add new health goal...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="flex items-center text-lg mb-2">
+                                <span class="w-3 h-3 rounded-full mr-2" style="background-color: #ffd3b6;"></span>
+                                Personal Growth
+                            </h4>
+                            <div class="ml-5 space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Learn a new language</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="custom-checkbox mr-3">
+                                    <span>Start meditation practice</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="text" class="planner-input text-sm" placeholder="Add new personal goal...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn mt-6">
+                        <i class="fas fa-plus mr-2"></i> Add Category
+                    </button>
+                </div>
+                
+                <!-- Goal tracker card -->
+                <div class="planner-card p-6">
+                    <h3 class="text-2xl mb-4 font-semibold flex items-center">
+                        <i class="fas fa-chart-line mr-2" style="color: var(--primary);"></i>
+                        Goal Progress
+                    </h3>
+                    
+                    <!-- Sample goal progress -->
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">Learn to cook 10 new recipes</span>
+                                <span>50%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%"></div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">5/10 recipes completed</div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">Save $5000 for vacation</span>
+                                <span>30%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">$1,500 saved so far</div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">Read 24 books this year</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 25%"></div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">6/24 books completed</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Milestone celebration -->
+                    <div class="mt-8 bg-gradient-to-r from-pink-100 to-purple-100 p-4 rounded-lg text-center">
+                        <h4 class="font-medium mb-2">Latest Achievement</h4>
+                        <p class="text-lg" id="achievement-date">🎉 Completed 30-day yoga challenge! 🎉</p>
+                        <div class="text-sm text-gray-600 mt-1" id="achievement-completed-date"></div>
+                    </div>
+                    
+                    <!-- Goal reflection -->
+                    <div class="mt-6">
+                        <h4 class="font-medium mb-2">Reflection & Notes</h4>
+                        <textarea class="planner-input h-28" placeholder="Reflect on your progress, challenges, and learnings..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Affirmations tab content -->
+        <div id="affirmations-content" class="tab-content">
+            <div class="planner-card p-6 mb-8">
+                <h3 class="text-2xl mb-6 font-semibold">Daily Affirmations</h3>
+                
+                <!-- Daily affirmation display -->
+                <div class="text-center mb-8">
+                    <div class="title-font text-3xl mb-4" style="color: var(--primary-dark);" id="daily-affirmation">
+                        I am capable of achieving anything I set my mind to.
+                    </div>
+                    <button class="btn" id="new-affirmation-btn">
+                        <i class="fas fa-sync-alt mr-2"></i> New Affirmation
+                    </button>
+                </div>
+                
+                <!-- Affirmation categories -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-xl mb-3 font-medium">Self-Love</h4>
+                        <div class="space-y-3">
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I am worthy of love and respect
+                            </div>
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I embrace my unique qualities
+                            </div>
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I am enough exactly as I am
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <input type="text" class="planner-input text-sm" placeholder="Add new affirmation...">
+                                <button class="btn ml-2 text-sm">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl mb-3 font-medium">Growth & Success</h4>
+                        <div class="space-y-3">
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I am constantly growing and evolving
+                            </div>
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I have the power to create change
+                            </div>
+                            <div class="p-3 rounded-lg" style="background-color: var(--bg-dark);">
+                                I turn challenges into opportunities
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <input type="text" class="planner-input text-sm" placeholder="Add new affirmation...">
+                                <button class="btn ml-2 text-sm">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create new category -->
+                <div class="text-center mt-8">
+                    <button class="btn">
+                        <i class="fas fa-plus mr-2"></i> Add New Category
+                    </button>
+                </div>
+                
+                <!-- Affirmation practice -->
+                <div class="mt-8 p-5 rounded-lg" style="background-color: var(--bg-dark);">
+                    <h4 class="text-xl mb-3 font-medium">Affirmation Practice</h4>
+                    <p class="mb-4">For maximum benefit, repeat your affirmations daily, preferably in the morning. Speak them aloud while looking in a mirror, or write them down in your journal.</p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Reminder Time</label>
+                            <select class="planner-input">
+                                <option>7:00 AM</option>
+                                <option>8:00 AM</option>
+                                <option>9:00 AM</option>
+                                <option>Custom...</option>
+                            </select>
+                        </div>
+                        <button class="btn">Set Reminder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes tab content -->
+        <div id="notes-content" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Notes sidebar -->
+                <div class="md:col-span-1">
+                    <div class="planner-card p-5">
+                        <h3 class="text-xl mb-4 font-semibold">My Notes</h3>
+                         <!-- Search box -->
+                         <div class="relative mb-4">
+                            <input type="text" class="planner-input pl-10" placeholder="Search notes...">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        
+                        <!-- Note categories -->
+                        <div class="mb-4">
+                            <div class="flex items-center py-2 px-3 rounded-lg mb-2 cursor-pointer hover:bg-gray-100">
+                                <i class="fas fa-book mr-2" style="color: var(--primary);"></i>
+                                <span>All Notes</span>
+                                <span class="ml-auto bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">8</span>
+                            </div>
+                            <div class="flex items-center py-2 px-3 rounded-lg mb-2 cursor-pointer bg-gray-100">
+                                <i class="fas fa-heart mr-2" style="color: var(--primary);"></i>
+                                <span>Inspiration</span>
+                                <span class="ml-auto bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">3</span>
+                            </div>
+                            <div class="flex items-center py-2 px-3 rounded-lg mb-2 cursor-pointer hover:bg-gray-100">
+                                <i class="fas fa-lightbulb mr-2" style="color: var(--primary);"></i>
+                                <span>Ideas</span>
+                                <span class="ml-auto bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">2</span>
+                            </div>
+                            <div class="flex items-center py-2 px-3 rounded-lg cursor-pointer hover:bg-gray-100">
+                                <i class="fas fa-book-open mr-2" style="color: var(--primary);"></i>
+                                <span>Journal</span>
+                                <span class="ml-auto bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Add new category -->
+                        <button class="btn w-full">
+                            <i class="fas fa-plus mr-2"></i> New Category
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notes main area -->
+                <div class="md:col-span-2">
+                    <div class="planner-card p-5">
+                        <!-- Note header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Inspiration</h3>
+                            <div>
+                                <button class="btn">
+                                    <i class="fas fa-plus mr-2"></i> New Note
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes list -->
+                        <div class="space-y-4" id="notes-list">
+                            <!-- Notes will be dynamically updated with current dates -->
+                        </div>
+                        
+                        <!-- New note editor -->
+                        <div class="mt-6 p-4 border border-dashed rounded-lg" style="border-color: var(--primary);">
+                            <input type="text" class="planner-input mb-3" placeholder="Note title...">
+                            <textarea class="planner-input h-32" placeholder="Write your thoughts here..."></textarea>
+                            <div class="flex justify-between mt-3">
+                                <div>
+                                    <button class="mr-2 text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-bold"></i>
+                                    </button>
+                                    <button class="mr-2 text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-italic"></i>
+                                    </button>
+                                    <button class="mr-2 text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-list-ul"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                </div>
+                                <button class="btn">Save Note</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for functionality -->
+    <script>
+        // Wait for the DOM to be fully loaded before running JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Current date variables
+            let currentDate = new Date();
+            let selectedDate = new Date();
+            let currentWeekStart = getMonday(new Date());
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            
+            // Cache frequently used DOM elements
+            const currentDateEl = document.getElementById('current-date');
+            const currentDayEl = document.getElementById('current-day');
+            const weekRangeEl = document.getElementById('week-range');
+            const monthYearEl = document.getElementById('month-year');
+            const monthDaysEl = document.getElementById('month-days');
+            
+            // Set current date in header
+            updateCurrentDateDisplay();
+            
+            // Initialize all views
+            initializeCalendarViews();
+            
+            // Initialize notes with current dates
+            initializeNotes();
+            
+            // Initialize achievement date
+            updateAchievementDate();
+            
+            // Add event listeners for navigation buttons
+            document.getElementById('prev-month').addEventListener('click', () => navigateMonth(-1));
+            document.getElementById('next-month').addEventListener('click', () => navigateMonth(1));
+            document.getElementById('prev-week').addEventListener('click', () => navigateWeek(-1));
+            document.getElementById('next-week').addEventListener('click', () => navigateWeek(1));
+            
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    // Show the corresponding tab content
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-content`).classList.add('active');
+                });
+            });
+            
+            // To-do list functionality
+            const todoInput = document.getElementById('new-task');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const todoList = document.querySelector('.todo-list');
+            
+            // Add new task
+            addTaskBtn.addEventListener('click', function() {
+                addNewTask();
+            });
+            
+            // Allow Enter key to add task
+            todoInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addNewTask();
+                }
+            });
+            
+            // Function to add new task
+            function addNewTask() {
+                const taskText = todoInput.value.trim();
+                if (taskText) {
+                    // Create new task element
+                    const newTask = document.createElement('div');
+                    newTask.className = 'flex items-center';
+                    newTask.innerHTML = `
+                        <input type="checkbox" class="custom-checkbox mr-3">
+                        <span class="flex-grow">${taskText}</span>
+                        <button class="text-gray-400 hover:text-gray-600 delete-task">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    // Add to list
+                    todoList.appendChild(newTask);
+                    
+                    // Clear input
+                    todoInput.value = '';
+                    
+                    // Update progress
+                    updateTaskProgress();
+                    
+                    // Add event listener to delete button
+                    newTask.querySelector('.delete-task').addEventListener('click', function() {
+                        newTask.remove();
+                        updateTaskProgress();
+                    });
+                    
+                    // Add event listener to checkbox for updating progress
+                    newTask.querySelector('.custom-checkbox').addEventListener('change', updateTaskProgress);
+                }
+            }
+            
+            // Update task progress
+            function updateTaskProgress() {
+                const totalTasks = document.querySelectorAll('.todo-list .custom-checkbox').length;
+                const completedTasks = document.querySelectorAll('.todo-list .custom-checkbox:checked').length;
+                
+                // Update progress text
+                document.getElementById('task-progress').textContent = `${completedTasks}/${totalTasks} completed`;
+                
+                // Update progress bar
+                const progressPercent = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                document.querySelector('.progress-fill').style.width = `${progressPercent}%`;
+            }
+            
+            // Initialize task progress
+            updateTaskProgress();
+            
+            // Set up event listeners for existing delete buttons
+            document.querySelectorAll('.delete-task').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.flex').remove();
+                    updateTaskProgress();
+                });
+            });
+            
+            // Set up event listeners for existing checkboxes
+            document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateTaskProgress);
+            });
+            
+            // Mood selection
+            const moodOptions = document.querySelectorAll('.mood-option');
+            moodOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    moodOptions.forEach(o => o.classList.remove('bg-pink-100'));
+                    // Add active class to clicked option
+                    this.classList.add('bg-pink-100');
+                });
+            });
+            
+            // Daily affirmation rotation
+            const affirmations = [
+                "I am capable of achieving anything I set my mind to.",
+                "I trust myself to make the right decisions.",
+                "I am worthy of love and respect.",
+                "I embrace the person I am becoming.",
+                "I am grateful for all that I have.",
+                "I release all negativity and welcome positivity.",
+                "I am in control of my happiness.",
+                "I choose to see the beauty in life.",
+                "My potential is limitless."
+            ];
+            
+            const affirmationElement = document.getElementById('daily-affirmation');
+            const newAffirmationBtn = document.getElementById('new-affirmation-btn');
+            
+            // Show random affirmation when button is clicked
+            if (newAffirmationBtn) {
+                newAffirmationBtn.addEventListener('click', function() {
+                    const randomIndex = Math.floor(Math.random() * affirmations.length);
+                    affirmationElement.textContent = affirmations[randomIndex];
+                    
+                    // Add a little animation
+                    affirmationElement.style.opacity = '0';
+                    setTimeout(() => {
+                        affirmationElement.style.opacity = '1';
+                    }, 300);
+                });
+            }
+            
+            // Helper Functions for Date Management
+            
+            // Get Monday of the week containing the provided date
+            function getMonday(date) {
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+                return new Date(date.setDate(diff));
+            }
+            
+            // Format date to string (Month Day, Year)
+            function formatDate(date) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+            
+            // Format date to short string (Month Day)
+            function formatShortDate(date) {
+                const options = { month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+            
+            // Get days in month
+            function getDaysInMonth(year, month) {
+                return new Date(year, month + 1, 0).getDate();
+            }
+            
+            // Get first day of month (0 = Sunday, 1 = Monday, etc.)
+            function getFirstDayOfMonth(year, month) {
+                return new Date(year, month, 1).getDay();
+            }
+            
+            // Update the current date display in the header
+            function updateCurrentDateDisplay() {
+                const now = new Date();
+                currentDateEl.innerText = formatDate(now);
+                currentDayEl.innerText = now.toLocaleDateString('en-US', { weekday: 'long' });
+            }
+            
+            // Navigate to previous/next month
+            function navigateMonth(direction) {
+                currentMonth += direction;
+                
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                } else if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                
+                renderMonthCalendar();
+            }
+            
+            // Navigate to previous/next week
+            function navigateWeek(direction) {
+                currentWeekStart.setDate(currentWeekStart.getDate() + (7 * direction));
+                renderWeekCalendar();
+            }
+            
+            // Initialize all calendar views (monthly, weekly)
+            function initializeCalendarViews() {
+                renderMonthCalendar();
+                renderWeekCalendar();
+            }
+            
+            // Render the monthly calendar
+            function renderMonthCalendar() {
+                // Update month and year display
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                monthYearEl.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+                
+                // Clear existing calendar days
+                monthDaysEl.innerHTML = '';
+                
+                // Get number of days in current month
+                const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+                
+                // Get day of week of first day (0 = Sunday, 1 = Monday, etc.)
+                const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth);
+                
+                // Get number of days in previous month
+                const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
+                
+                // Add days from previous month
+                for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+                    const day = daysInPrevMonth - i;
+                    const dayEl = document.createElement('div');
+                    dayEl.classList.add('calendar-day', 'other-month');
+                    dayEl.textContent = day;
+                    monthDaysEl.appendChild(dayEl);
+                }
+                
+                // Add days for current month
+                const today = new Date();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.classList.add('calendar-day');
+                    dayEl.textContent = day;
+                    
+                    // Check if this day is today
+                    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                        dayEl.classList.add('today');
+                    }
+                    
+                    // Check if this day is selected
+                    if (day === selectedDate.getDate() && currentMonth === selectedDate.getMonth() && currentYear === selectedDate.getFullYear()) {
+                        dayEl.classList.add('active');
+                    }
+                    
+                    // Add click event to select day
+                    dayEl.addEventListener('click', function() {
+                        // Remove active class from all days
+                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+                        // Add active class to clicked day
+                        this.classList.add('active');
+                        // Update selected date
+                        selectedDate = new Date(currentYear, currentMonth, day);
+                    });
+                    
+                    monthDaysEl.appendChild(dayEl);
+                }
+                
+                // Calculate how many days from next month we need to fill the grid (making it 6 rows of 7 days)
+                const totalDaysShown = firstDayOfMonth + daysInMonth;
+                const remainingCells = 42 - totalDaysShown; // 6 rows of 7 days = 42
+                
+                // Add days from next month
+                for (let day = 1; day <= remainingCells; day++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.classList.add('calendar-day', 'other-month');
+                    dayEl.textContent = day;
+                    monthDaysEl.appendChild(dayEl);
+                }
+            }
+            
+            // Render the weekly calendar
+            function renderWeekCalendar() {
+                // Calculate end of week date
+                const weekEndDate = new Date(currentWeekStart);
+                weekEndDate.setDate(weekEndDate.getDate() + 6);
+                
+                // Update week range display
+                weekRangeEl.innerText = `${formatShortDate(currentWeekStart)} - ${formatShortDate(weekEndDate)}, ${weekEndDate.getFullYear()}`;
+                
+                // Generate the days for the week view
+                const weeklyDaysContainer = document.getElementById('weekly-days');
+                weeklyDaysContainer.innerHTML = '';
+                
+                const today = new Date();
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(currentWeekStart);
+                    day.setDate(day.getDate() + i);
+                    
+                    const dayEl = document.createElement('div');
+                    dayEl.classList.add('calendar-day');
+                    dayEl.textContent = day.getDate();
+                    
+                    // Check if this day is today
+                    if (day.getDate() === today.getDate() && 
+                        day.getMonth() === today.getMonth() && 
+                        day.getFullYear() === today.getFullYear()) {
+                        dayEl.classList.add('today');
+                        dayEl.classList.add('active');
+                    }
+                    
+                    weeklyDaysContainer.appendChild(dayEl);
+                }
+            }
+            
+            // Initialize notes with current dates
+            function initializeNotes() {
+                const notesList = document.getElementById('notes-list');
+                
+                // Create notes with dynamic dates (based on current date)
+                const now = new Date();
+                const noteDates = [
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2), // 2 days ago
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7), // 1 week ago
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate() - 14) // 2 weeks ago
+                ];
+                
+                // Note templates
+                const noteTemplates = [
+                    {
+                        title: 'Books to Read',
+                        content: `1. "Atomic Habits" by James Clear<br>
+                                 2. "The Mountain Is You" by Brianna Wiest<br>
+                                 3. "Big Magic" by Elizabeth Gilbert`
+                    },
+                    {
+                        title: 'Self-Care Ideas',
+                        content: `- Take a relaxing bath with essential oils<br>
+                                 - Practice yoga for 15 minutes in the morning<br>
+                                 - Make a healthy smoothie bowl<br>
+                                 - Go for a nature walk<br>
+                                 - Journal for 10 minutes before bed`
+                    },
+                    {
+                        title: 'Favorite Quotes',
+                        content: `"The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt<br><br>
+                                 "You are never too old to set another goal or to dream a new dream." - C.S. Lewis`
+                    }
+                ];
+                
+                // Create and append notes
+                for (let i = 0; i < noteTemplates.length; i++) {
+                    const noteEl = document.createElement('div');
+                    noteEl.className = 'note';
+                    noteEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-medium">${noteTemplates[i].title}</h4>
+                            <div class="text-xs text-gray-500">${formatDate(noteDates[i])}</div>
+                        </div>
+                        <p class="text-gray-600 mt-2">
+                            ${noteTemplates[i].content}
+                        </p>
+                    `;
+                    notesList.appendChild(noteEl);
+                }
+            }
+            
+            // Update achievement date to a recent date
+            function updateAchievementDate() {
+                const achievementDateEl = document.getElementById('achievement-completed-date');
+                if (achievementDateEl) {
+                    const now = new Date();
+                    const achievementDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 5);
+                    achievementDateEl.textContent = `Achieved on ${formatDate(achievementDate)}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
